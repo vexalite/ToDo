@@ -9,5 +9,6 @@ function readData(){
 
 
 module.exports = {
-    readData
+    readData,
+    fs
 }
