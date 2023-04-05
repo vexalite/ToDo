@@ -3,16 +3,24 @@ const utils = require("./utils/utils.js")
 // const fs = require("fs/promises")
 const app = express()
 const router = require("./routes/todos.routes.js")
-//////////////////////////// Middleware //////////////////////////////////////////
+const viewsRouter = require("./routes/views.routes.js/index.js")
+//////////////////////////////////  Set View Engine \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+app.set("view engine", "ejs")           // mounting the view engine on express
 
+
+//////////////////////////// Middleware //////////////////////////////////////////
 app.use(express.json())
 
-app.get("/", (req,res) => {
-    return res.send("Home of the Lander")
-})
+// app.get("/", (req,res) => {
+//     return res.send("Home of the Lander")
+// })
+
+///////////////////////   Routers   //////////////////////////////////////////////////
+
+app.use("/", viewsRouter)
 
 app.use("/todos", router)
-///////////////////////   Routers   //////////////////////////////////////////////////
+
 
 // app.get("/todos",(req,res) => {
 //     return utils.readData()
