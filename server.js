@@ -3,7 +3,7 @@ const utils = require("./utils/utils.js")
 // const fs = require("fs/promises")
 const app = express()
 const router = require("./routes/todos.routes.js")
-const viewsRouter = require("./routes/views.routes.js/index.js")
+const viewsRouter = require("./routes/views.routes")
 //////////////////////////////////  Set View Engine \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 app.set("view engine", "ejs")           // mounting the view engine on express
 
@@ -20,6 +20,7 @@ app.use(express.json())
 app.use("/", viewsRouter)
 
 app.use("/todos", router)
+
 
 
 // app.get("/todos",(req,res) => {
