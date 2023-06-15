@@ -1,0 +1,88 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Document</title>
+</head>
+<body>
+    <div style="margin-top: -220px;" class=" ml-10  float-right">
+        <img src="https://unsplash.it/1420/1020
+        " alt="">
+      </div>
+    <div class=" mt-48 ml-20">
+        <h1 class="text-3xl font-bold mb-6">SignUp</h1>
+<form id="registerSubmitForm">
+    <div class="mb-6">
+        <label for="name" class="block mb-2 text-sm font-medium text-gray-900 ">Your Name</label>
+        <input type="text" id="name"  required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-80 p-2.5 " placeholder="name@flowbite.com" required>
+      </div>
+    <div class="mb-6">
+      <label for="email" class="block mb-2 text-sm font-medium text-gray-900 ">Your email</label>
+      <input type="email" id="email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-80 p-2.5 " placeholder="name@flowbite.com" required>
+    </div>
+    <div class="mb-6">
+      <label for="password" class="block mb-2 text-sm font-medium text-gray-900 ">Your password</label>
+      <input type="password" id="password" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-80 p-2.5 " required>
+    </div>
+    <div class="flex items-start mb-6">
+      <div class="flex items-center h-5">
+        <input id="remember" type="checkbox" value="" class="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-blue-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800" required>
+      </div>
+      <label for="remember" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Remember me</label>
+    </div>
+   
+   <button type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"><input type="submit" value="Register" /></button>
+   <a href="/auth/login">Login</a>
+  </form>
+  
+      </div>
+
+
+    <script>
+            document.getElementById("registerSubmitForm").addEventListener("submit", function(event){
+                event.preventDefault()
+                console.log("submittig");
+
+                const name = document.getElementById("name").value
+                const email = document.getElementById("email").value
+                const password = document.getElementById("password").value
+
+                const body = {
+                    name,
+                    email,
+                    password
+                }
+
+                // fetch(`http://localhost:3000/api/v1/auth`, {
+                fetch(`/api/v1/auth/register`, {
+                    method: "POST",
+                    // without header the request payload will be [object Object]
+                    headers: {
+                        "Accept" : "application/json",
+                        "Content-type": "application/json"
+                    },
+                    body: JSON.stringify(body)
+                })
+                // fetch is a promise so need to resolve it
+                .then((response) => response.json())
+                .then((data) => {
+                    if(data.error){
+                        const errorString = JSON.stringify(data.error)
+                        alert(errorString)
+                    }
+                    else{
+                        localStorage.setItem("access_token", data.access_token)
+                        localStorage.setItem("username", data.data.newUser.name)
+
+                        alert(data.message)
+                        document.getElementById("logout").classList.remove("d-none")
+                        window.location.href = "/"
+                    }
+                })
+                .catch((error)=> alert(error.toString()))
+            })
+        </script>
+    <%- include("partials/footer") %>

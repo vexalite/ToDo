@@ -3,6 +3,8 @@ const utils = require("../utils/utils.js")
 const fs = require("fs/promises")
 const { isTypedArray } = require("util/types")
 const router = express.Router()
+const { body, validationResult } = require("express-validator")
+const { isAuthenticated } = require("../middlewares")
 
 router.get("/",(req,res) => {
     return utils.readData()
@@ -16,25 +18,68 @@ router.get("/",(req,res) => {
    
 })
 
-router.post("/",(req,res)=>{
+// router.post("/",(req,res)=>{
+//     const newTodo = req.body
+//     return utils.readData()
+//     .then((data) =>{
+//         data.push(newTodo)
+//         return utils.fs.writeFile("db.json", JSON.stringify(data))
+//     })
+//     .then (() => {
+//         return res.status(201)
+//         .json({
+//             message: "All todos fetched",
+//             data: newTodo,
+//             error:null
+//         })
+//     })
+// })
+
+router.post("/", isAuthenticated, body("title").custom((title)=>{
+    if(typeof title === "string" && title.length >= 3){
+        return true;
+    }
+    return false;
+}).withMessage("Provide suitable title with more than or equals to 3 characters"),
+body("completed").custom((completed) => {
+    if(typeof completed === "boolean"){
+        return true
+    }
+    return false
+}).withMessage("Completed radio button should be true/false."),
+(req, res) => {
     const newTodo = req.body
+
+    console.log("---post body---", newTodo);
+
+    // to show errors in the response object
+    const errors = validationResult(req);
+    
+    if(!errors.isEmpty()){
+        console.log("---erors---", errors);
+         return res.status(400).json({
+            message: "Todo creation failed.",
+            error: errors.array(),
+            data: {}
+         })
+    }
     return utils.readData()
-    .then((data) =>{
+    .then((data)=>{
         data.push(newTodo)
-        return utils.fs.writeFile("db.json", JSON.stringify(data))
+
+        // writing the JSON object after converting it to string
+        return fs.writeFile("db.json", JSON.stringify(data))
     })
-    .then (() => {
-        return res.status(201)
-        .json({
-            message: "All todos fetched",
+    .then(()=>{
+        return res.status(201).json({
+            message: "New todo added",
             data: newTodo,
-            error:null
+            error: null
         })
     })
 })
 
-
-router.get("/:title",(req,res) =>{
+router.get("/:title", isAuthenticated, (req,res) =>{
     const title = req.params.title.toLowerCase()
     
     return utils.readData()
@@ -54,7 +99,7 @@ router.get("/:title",(req,res) =>{
    
 })
 
-router.put("/:title", (req,res) => {
+router.put("/:title", isAuthenticated,  (req,res) => {
     const title = req.params.title.toLowerCase()
     const updateTodo = req.body
     return utils.readData()
@@ -84,7 +129,7 @@ router.put("/:title", (req,res) => {
 })
 
 
-router.delete(("/:title"), (req,res) =>{
+router.delete(("/:title"),isAuthenticated,  (req,res) =>{
     const title = req.params.title.toLowerCase()
     let deletedObj
 

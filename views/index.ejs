@@ -1,17 +1,36 @@
 
-<%- include("partials/header.ejs") %>
-        <% todos.forEach((todo) => { %>
-          <a href="/todos/<%=todo.title%>" class="btn">
-            <%= todo.title %>
-        </a>
-            <p >
-                <%=todo.desc%>
-            </p>
-            <h5 class = text-3xl>
-                <%=todo.comp ? "done" : "undone"%>
-            </h5>
-            <br>
-            <br>
-        <% }) %>
+        <%- include("partials/header")   %>
+<div class="mb-6 p-6 flex gap-4">
+        <% todos.forEach((todo, index)=> { %>
+<div class=" max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+    <a onclick="checkAuth(`/todos/<%=todo.title%>`)">
+        <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white"> <%= todo.title %></h5>
+    </a>
+    <p class="mb-3 font-normal text-gray-700 dark:text-gray-400"><%= todo.description%></p>
+    <a onclick="checkAuth(`/todos/<%=todo.title%>`)" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+        <%= todo.completed ? "done" : "undone" %>
+        <svg aria-hidden="true" class="w-4 h-4 ml-2 -mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+    </a>
+</div>
+<% }) %>
+</div>
+        <script>
+            let token = localStorage.getItem("access_token")
+            
+            // console.log("auth is ", token);
 
-        <%- include("partials/footer.ejs") %>
+            function checkAuth(e){
+                // console.log("i am here", e);
+
+                if(!token){
+                    alert("You are not logged in. So redirecting you to the login page")
+                    window.location.href = "/auth/login"
+                    return
+                }
+                else{
+                    window.location.href = e
+                }
+                return
+            }
+        </script>
+<%- include("partials/footer")   %>

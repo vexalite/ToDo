@@ -1,0 +1,90 @@
+<%- include("partials/header") %>
+                        <h1>Add Todo Item</h1>
+                        <form id="todoAddTodoForm">
+                        <div class="mb-6">
+                            <label for="title" class="block mb-2 text-sm font-medium text-gray-900 ">Title</label>
+                            <input type="text" id="title" class="block w-full p-4 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-md focus:ring-blue-500 focus:border-blue-500 ">
+                        </div>
+                        <div class="mb-6">
+                            <label for="description" class="block mb-2 text-sm font-medium text-gray-900 ">Description</label>
+                            <input type="text" id="description" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ">
+                        </div>
+                        
+                        <fieldset>
+                            <legend class="sr-only">status</legend>
+                          
+                            <div class="flex items-center mb-4">
+                              <input id="Done" type="radio" name="countries" value="USA" class="w-4 h-4 border-gray-300 focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-600 " checked>
+                              <label for="country-option-1" class="block ml-2 text-sm font-medium text-gray-900 ">
+                                Task Completed
+                              </label>
+                            </div>
+                          
+                            <div class="flex items-center mb-4">
+                              <input id="NotDone" type="radio" name="countries" value="Germany" class="w-4 h-4 border-gray-300 focus:ring-2 focus:ring-blue-300 ">
+                              <label for="country-option-2" class="block ml-2 text-sm font-medium text-gray-900 ">
+                                Task Incomplete
+                              </label>
+                            </div>
+                          </fieldset>
+                          <button type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"><input class="btn btn-primary" type="submit"
+                            value="Add" /></button>
+                          
+</form>
+    <script>
+            document.getElementById("todoAddTodoForm").addEventListener("submit", function(event){
+                event.preventDefault()
+                console.log("submittig");
+
+                const title = document.getElementById("title").value
+                const description = document.getElementById("description").value
+                const completedDone = document.getElementById("Done")
+
+                // console.log("checkbox is ", completedDone.checked);
+                // console.log("checkbox is ", title.value);
+                const body = {
+                    title,
+                    description,
+                    completed: Done.checked ? true : false 
+                }
+
+                let token = localStorage.getItem("access_token")
+
+                // fetch(`http://localhost:3000/api/todos/${title}`, {
+                fetch(`/api/todos/`, {
+                    method: "POST",
+                    // without header the request payload will be [object Object]
+                    headers: {
+                        "Accept" : "application/json",
+                        "Content-type": "application/json",
+                        // sending a custom key value in the headers to check it via the middleware isAuthenticated
+                        // Authorization = authorization... it is lower cased internally
+                        "Authorization": token
+                    },
+                    body: JSON.stringify(body)
+                })
+                // fetch is a promise so need to resolve it
+                .then((response) => {
+                    console.log("---Token respone---", token, response.status);
+
+                    return response.json()
+
+                    // this then block is for response.json() which is a promise
+                    .then((data) => {
+                        if(data.redirect){
+                            alert("You are not logged in. So redirecting you to the login page")
+                            window.location.href = "/auth/login"
+                            return
+                        }
+                        if(data.error){
+                            const errorString = JSON.stringify(data.error)
+                        }
+                        else{
+                            alert(data.message)
+                        }
+                    })
+                })
+                .catch((error)=> alert(error.toString()))
+            })
+        </script>
+    <%- include("partials/footer") %>
